@@ -1,0 +1,22 @@
+{
+  "name": "tickety",
+  "version": "1.0.0",
+  "description": "A blockchain-based ticketing system",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Henry",
+  "license": "ISC",
+  "devDependencies": {
+    "@nomicfoundation/hardhat-ethers": "^3.0.8",
+    "@nomicfoundation/hardhat-ignition-ethers": "^0.15.7",
+    "@nomicfoundation/hardhat-toolbox": "^5.0.0",
+    "ethers": "^6.13.4",
+    "hardhat": "^2.22.15"
+  },
+  "dependencies": {
+    "@openzeppelin/contracts": "^5.1.0",
+    "node": "^20.18.1"
+  }
+}

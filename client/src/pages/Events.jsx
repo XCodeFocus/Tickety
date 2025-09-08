@@ -1,0 +1,134 @@
+import React, { useState, useEffect } from "react";
+import { ethers } from "ethers";
+import Navbar from "../components/Navbar";
+import EventCard from "../components/EventCard";
+import Footer from "../components/Footer";
+import ConcertFactoryABI from "../contract/ConcertFactoryABI.json";
+import ConcertABI from "../contract/ConcertABI.json";
+const FACTORY_ADDRESS = "0xda5D0044467b3c5dEB124Ea5F0C49F7ede29EB1C";
+const HIDDEN_KEY = "hidden_concerts";
+
+function Events() {
+  const [events, setEvents] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  // 取得隱藏清單
+  const getHidden = () => {
+    try {
+      return JSON.parse(localStorage.getItem(HIDDEN_KEY)) || [];
+    } catch {
+      return [];
+    }
+  };
+
+  // 新增到隱藏清單
+  const addHidden = (address) => {
+    const hidden = getHidden();
+    if (!hidden.includes(address)) {
+      localStorage.setItem(HIDDEN_KEY, JSON.stringify([...hidden, address]));
+    }
+  };
+
+  const fetchEvents = async () => {
+    setLoading(true);
+    try {
+      const provider = new ethers.BrowserProvider(window.ethereum);
+      const factory = new ethers.Contract(
+        FACTORY_ADDRESS,
+        ConcertFactoryABI,
+        provider
+      );
+      const addresses = await factory.getAllConcerts();
+      const hidden = getHidden();
+
+      const eventPromises = addresses
+        .filter((address) => !hidden.includes(address))
+        .map(async (address) => {
+          const contract = new ethers.Contract(address, ConcertABI, provider);
+          const name = await contract.name();
+          const price = await contract.ticketPrice();
+          const maxTickets = await contract.maxTickets();
+          let sold = 0n;
+          try {
+            sold = await contract.ticketId();
+          } catch {}
+          const remain = BigInt(maxTickets) - BigInt(sold);
+          const saleActive = await contract.saleActive();
+          return {
+            address,
+            name,
+            price: ethers.formatEther(price),
+            remain: remain.toString(),
+            saleActive,
+          };
+        });
+
+      const eventsData = await Promise.all(eventPromises);
+      setEvents(eventsData);
+    } catch (err) {
+      console.error("Failed to load blockchain data", err);
+      setEvents([]);
+    }
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    fetchEvents();
+  }, []);
+
+  // 刪除時加入隱藏清單並重新 fetch
+  const handleDelete = (address) => {
+    if (window.confirm("Are you sure you want to hide this event?")) {
+      addHidden(address);
+      fetchEvents();
+    }
+  };
+
+  return (
+    <div className="app-container">
+      <Navbar />
+      <button
+        className="px-2 py-1 bg-gray-500 hover:bg-green-600 text-white shadow"
+        onClick={() => {
+          localStorage.removeItem("hidden_concerts");
+          window.location.reload();
+        }}
+      >
+        show all hidden events
+      </button>
+      <button
+        className="px-2 py-1 bg-gray-500 hover:bg-red-600 text-white shadow"
+        onClick={async () => {
+          // 直接從 Factory 取得所有地址
+          const provider = new ethers.BrowserProvider(window.ethereum);
+          const factory = new ethers.Contract(
+            FACTORY_ADDRESS,
+            ConcertFactoryABI,
+            provider
+          );
+          const addresses = await factory.getAllConcerts();
+          localStorage.setItem("hidden_concerts", JSON.stringify(addresses));
+          window.location.reload();
+        }}
+      >
+        hide all events
+      </button>
+      <div className="flex-1">
+        {loading ? (
+          <div className="text-center mt-10">loading...</div>
+        ) : (
+          events.map((event) => (
+            <EventCard
+              key={event.address}
+              event={event}
+              onDelete={handleDelete}
+              onBought={fetchEvents}
+            />
+          ))
+        )}
+      </div>
+      <Footer />
+    </div>
+  );
+}
+export default Events;
