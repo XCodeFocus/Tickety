@@ -12,17 +12,17 @@ contract ConcertFactory {
         uint256 maxTickets,
         uint256 ticketPrice,
         string memory concertName,
-        uint256 concertTime // 新增
+        uint256 concertTime
     ) public returns (address) {
         concert newConcert = new concert(
             maxTickets,
             ticketPrice,
             concertName,
             msg.sender,
-            concertTime // 新增
+            concertTime 
         );
         allConcerts.push(address(newConcert));
-        emit ConcertCreated(address(newConcert), concertName, concertTime); // 新增
+        emit ConcertCreated(address(newConcert), concertName, concertTime); 
         return address(newConcert);
     }
 

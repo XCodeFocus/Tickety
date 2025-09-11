@@ -6,7 +6,7 @@ import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract concert is ERC721URIStorage, Ownable {
-    uint256 private ticketId;
+    uint256 public ticketId;
     uint256 public maxTickets;
     uint256 public ticketPrice;
     uint256 public concertTime; 

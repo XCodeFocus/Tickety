@@ -5,7 +5,7 @@ import EventCard from "../components/EventCard";
 import Footer from "../components/Footer";
 import ConcertFactoryABI from "../contract/ConcertFactoryABI.json";
 import ConcertABI from "../contract/ConcertABI.json";
-const FACTORY_ADDRESS = "0xda5D0044467b3c5dEB124Ea5F0C49F7ede29EB1C";
+const FACTORY_ADDRESS = "0xF4cd450447EBFBdE90cc3fD0BFa9175Fe687d5e1";
 const HIDDEN_KEY = "hidden_concerts";
 
 function Events() {
@@ -40,7 +40,6 @@ function Events() {
       );
       const addresses = await factory.getAllConcerts();
       const hidden = getHidden();
-
       const eventPromises = addresses
         .filter((address) => !hidden.includes(address))
         .map(async (address) => {
@@ -51,7 +50,9 @@ function Events() {
           let sold = 0n;
           try {
             sold = await contract.ticketId();
-          } catch {}
+          } catch (err) {
+            console.error("can't acquire ticketId:", err);
+          }
           const remain = BigInt(maxTickets) - BigInt(sold);
           const saleActive = await contract.saleActive();
           const concertTime = await contract.concertTime();
