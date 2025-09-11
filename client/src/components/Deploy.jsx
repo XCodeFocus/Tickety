@@ -56,7 +56,7 @@ export default function DeployForm() {
         parseInt(amount),
         ethers.parseEther(price),
         concertName,
-        timestamp // 新增
+        timestamp
       );
       const receipt = await tx.wait();
       // 從事件取得新合約地址

@@ -6,7 +6,7 @@ function EventCard({ event, onBought, onDelete }) {
   const [loading, setLoading] = useState(false);
   const [actionLoading, setActionLoading] = useState(false);
   const [isOwner, setIsOwner] = useState(false);
-  const [ownerAddress, setOwnerAddress] = useState(""); // 新增
+  const [ownerAddress, setOwnerAddress] = useState("");
 
   // 檢查目前帳號是否為 owner，並取得 owner address
   useEffect(() => {
@@ -77,7 +77,7 @@ function EventCard({ event, onBought, onDelete }) {
       if (onBought) onBought();
     } catch (err) {
       console.error(err);
-      alert("Failed to buy tickets" + (err?.message || err));
+      alert("Failed to buy tickets: " + (err?.message || err));
     }
     setLoading(false);
   };
@@ -103,7 +103,7 @@ function EventCard({ event, onBought, onDelete }) {
       if (onBought) onBought();
     } catch (err) {
       console.error(err);
-      alert("Failed to start sale" + (err?.reason || err?.message || err));
+      alert("Failed to start sale: " + (err?.reason || err?.message || err));
     }
     setActionLoading(false);
   };
@@ -129,7 +129,7 @@ function EventCard({ event, onBought, onDelete }) {
       if (onBought) onBought();
     } catch (err) {
       console.error(err);
-      alert("Failed to end sale" + (err?.reason || err?.message || err));
+      alert("Failed to end sale: " + (err?.reason || err?.message || err));
     }
     setActionLoading(false);
   };
