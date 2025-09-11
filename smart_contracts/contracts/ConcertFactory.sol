@@ -6,16 +6,23 @@ import "./Concert.sol";
 contract ConcertFactory {
     address[] public allConcerts;
 
-    event ConcertCreated(address indexed concertAddress, string name);
+    event ConcertCreated(address indexed concertAddress, string name, uint256 concertTime);
 
     function createConcert(
         uint256 maxTickets,
         uint256 ticketPrice,
-        string memory concertName
+        string memory concertName,
+        uint256 concertTime // 新增
     ) public returns (address) {
-        concert newConcert = new concert(maxTickets, ticketPrice, concertName, msg.sender);
+        concert newConcert = new concert(
+            maxTickets,
+            ticketPrice,
+            concertName,
+            msg.sender,
+            concertTime // 新增
+        );
         allConcerts.push(address(newConcert));
-        emit ConcertCreated(address(newConcert), concertName);
+        emit ConcertCreated(address(newConcert), concertName, concertTime); // 新增
         return address(newConcert);
     }
 

@@ -8,7 +8,7 @@ import {
 import { useState } from "react";
 import { ethers } from "ethers";
 import ConcertFactoryABI from "../contract/ConcertFactoryABI.json";
-const FACTORY_ADDRESS = "0xda5D0044467b3c5dEB124Ea5F0C49F7ede29EB1C";
+const FACTORY_ADDRESS = "0x0b6cDE8105931e775a178b4e0Ee647DeC2772354";
 
 export default function DeployForm() {
   const [concertName, setConcertName] = useState("");
@@ -51,10 +51,12 @@ export default function DeployForm() {
         signer
       );
 
+      const timestamp = Math.floor(new Date(time).getTime() / 1000);
       const tx = await factory.createConcert(
         parseInt(amount),
         ethers.parseEther(price),
-        concertName
+        concertName,
+        timestamp // 新增
       );
       const receipt = await tx.wait();
       // 從事件取得新合約地址

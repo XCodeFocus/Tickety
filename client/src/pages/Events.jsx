@@ -54,12 +54,14 @@ function Events() {
           } catch {}
           const remain = BigInt(maxTickets) - BigInt(sold);
           const saleActive = await contract.saleActive();
+          const concertTime = await contract.concertTime();
           return {
             address,
             name,
             price: ethers.formatEther(price),
             remain: remain.toString(),
             saleActive,
+            time: Number(concertTime) * 1000, // 轉成 JS 毫秒
           };
         });
 

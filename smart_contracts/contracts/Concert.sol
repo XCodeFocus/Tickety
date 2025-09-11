@@ -9,6 +9,7 @@ contract concert is ERC721URIStorage, Ownable {
     uint256 private ticketId;
     uint256 public maxTickets;
     uint256 public ticketPrice;
+    uint256 public concertTime; // 新增
 
     bool public saleActive;
 
@@ -23,12 +24,14 @@ contract concert is ERC721URIStorage, Ownable {
         uint256 _maxTickets,
         uint256 _ticketPrice,
         string memory _concertName,
-        address _owner
+        address _owner,
+        uint256 _concertTime // 新增
     ) ERC721(_concertName, "TCK") Ownable(_owner) {
         ticketId = 0;
         maxTickets = _maxTickets;
         ticketPrice = _ticketPrice;
         saleActive = false;
+        concertTime = _concertTime; // 新增
     }
 
     // override _update from ERC721.sol to prohibit transfer
