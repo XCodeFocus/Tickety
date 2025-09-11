@@ -5,6 +5,10 @@ npx hardhat run scripts/deploy.js --network localhost
 deploy on sepolia:
 npx hardhat run scripts/deploy.js --network sepolia
 
+files with factory address:
+Deploy.jsx
+Event.jsx
+
 run test:
 npx hardhat test
 
