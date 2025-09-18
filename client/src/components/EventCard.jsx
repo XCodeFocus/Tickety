@@ -8,7 +8,7 @@ function EventCard({ event, onBought, onDelete }) {
   const [isOwner, setIsOwner] = useState(false);
   const [ownerAddress, setOwnerAddress] = useState("");
 
-  // 檢查目前帳號是否為 owner，並取得 owner address
+  // check if is owner, and get owner address
   useEffect(() => {
     async function checkOwner() {
       if (!window.ethereum || !event?.address) return;
@@ -22,7 +22,7 @@ function EventCard({ event, onBought, onDelete }) {
           provider
         );
         const owner = await contract.owner();
-        setOwnerAddress(owner); // 儲存 owner address
+        setOwnerAddress(owner);
         setIsOwner(owner.toLowerCase() === signer.address.toLowerCase());
       } catch (err) {
         setIsOwner(false);
@@ -30,7 +30,6 @@ function EventCard({ event, onBought, onDelete }) {
       }
     }
     checkOwner();
-    // eslint-disable-next-line
   }, [event?.address]);
 
   const handleBuy = async () => {
@@ -48,7 +47,7 @@ function EventCard({ event, onBought, onDelete }) {
       const ID = prompt("Enter your ID number:");
       if (!ID) throw new Error("ID number is required");
 
-      // 先綁定身份證字號與帳號（如果已綁定會失敗，可忽略錯誤）
+      // bind ID first, ignore "already registered" error
       try {
         const txBind = await contract.binding(ID);
         await txBind.wait();
@@ -63,7 +62,9 @@ function EventCard({ event, onBought, onDelete }) {
         }
       }
 
-      const tokenURI = "https://your-metadata-url/" + ID; // 或用空字串 ""
+      const ticketId = event.remain ? event.max - event.remain + 1 : 1;
+      // change this to actual base URI after uploading to IPFS/Filebase
+      const tokenURI = `https://senior-brown-chameleon.myfilebase.com/ipfs/QmUrSLg7KFfdYuR7oCvaBb8tF8htrJPbdztJKU9XUHrUXe/${ticketId}.json`;
       const priceStr =
         typeof event.price === "string" ? event.price : String(event.price);
       const buyer = await signer.getAddress();

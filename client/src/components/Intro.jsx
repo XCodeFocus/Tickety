@@ -20,13 +20,13 @@ export default function Intro() {
               </p>
               <div class="mt-10 flex flex-col items-center md:flex-row">
                 <a
-                  href="/"
+                  href="/Tickety"
                   class="mb-3 inline-flex h-12 w-full items-center justify-center rounded bg-green-600 px-6 font-medium tracking-wide text-white shadow-md transition hover:bg-blue-800 focus:outline-none md:mr-4 md:mb-0 md:w-auto"
                 >
                   View More
                 </a>
                 <a
-                  href="/events"
+                  href="/Tickety/events"
                   aria-label=""
                   class="group inline-flex items-center font-semibold text-g1"
                 >

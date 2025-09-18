@@ -5,14 +5,14 @@ import EventCard from "../components/EventCard";
 import Footer from "../components/Footer";
 import ConcertFactoryABI from "../contract/ConcertFactoryABI.json";
 import ConcertABI from "../contract/ConcertABI.json";
-const FACTORY_ADDRESS = "0xF4cd450447EBFBdE90cc3fD0BFa9175Fe687d5e1";
+const FACTORY_ADDRESS = "0x591A0204CFAA41B17517E63C5B48ed2C043E4137";
 const HIDDEN_KEY = "hidden_concerts";
 
 function Events() {
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // 取得隱藏清單
+  // get hidden list from localStorage
   const getHidden = () => {
     try {
       return JSON.parse(localStorage.getItem(HIDDEN_KEY)) || [];
@@ -21,7 +21,7 @@ function Events() {
     }
   };
 
-  // 新增到隱藏清單
+  // add to hidden list and save to localStorage
   const addHidden = (address) => {
     const hidden = getHidden();
     if (!hidden.includes(address)) {
@@ -62,7 +62,7 @@ function Events() {
             price: ethers.formatEther(price),
             remain: remain.toString(),
             saleActive,
-            time: Number(concertTime) * 1000, // 轉成 JS 毫秒
+            time: Number(concertTime) * 1000,
           };
         });
 
@@ -79,7 +79,7 @@ function Events() {
     fetchEvents();
   }, []);
 
-  // 刪除時加入隱藏清單並重新 fetch
+  // handle hide event
   const handleDelete = (address) => {
     if (window.confirm("Are you sure you want to hide this event?")) {
       addHidden(address);
@@ -102,7 +102,7 @@ function Events() {
       <button
         className="px-2 py-1 bg-gray-500 hover:bg-red-600 text-white shadow"
         onClick={async () => {
-          // 直接從 Factory 取得所有地址
+          // get all contract addresses
           const provider = new ethers.BrowserProvider(window.ethereum);
           const factory = new ethers.Contract(
             FACTORY_ADDRESS,

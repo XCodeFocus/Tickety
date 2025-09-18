@@ -16,12 +16,20 @@ export default function Navbar() {
   const location = useLocation();
 
   const navigation = [
-    { name: "Home", href: "/", current: location.pathname === "/" },
-    { name: "About", href: "/about", current: location.pathname === "/about" },
+    {
+      name: "Home",
+      href: "/Tickety",
+      current: location.pathname === "/Tickety",
+    },
+    {
+      name: "About",
+      href: "/Tickety/about",
+      current: location.pathname === "/Tickety/about",
+    },
     {
       name: "Events",
-      href: "/events",
-      current: location.pathname === "/events",
+      href: "/Tickety/events",
+      current: location.pathname === "/Tickety/events",
     },
   ];
 

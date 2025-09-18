@@ -10,11 +10,11 @@ export default function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/about" element={<About />} />
-        <Route path="/events" element={<Events />} />
-        <Route path="/backstage" element={<BackStage />} />
-        <Route path="/*" element={<NoPage />} />
+        <Route path="Tickety/" element={<Home />} />
+        <Route path="Tickety/about" element={<About />} />
+        <Route path="Tickety/events" element={<Events />} />
+        <Route path="Tickety/backstage" element={<BackStage />} />
+        <Route path="Tickety/*" element={<NoPage />} />
       </Routes>
     </Router>
   );

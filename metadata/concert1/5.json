@@ -1,0 +1,11 @@
+{
+  "name": "Concert Ticket #5",
+  "description": "Example Entry Ticket",
+  "image": "https://senior-brown-chameleon.myfilebase.com/ipfs/Qme59s7Eepxu6NbKSZAgSfkK6a1YN2K5efSkfZtPCDXFhG", 
+  "attributes": [
+    { "trait_type": "Concert", "value": "World Tour" },
+    { "trait_type": "Date", "value": "2025-12-01 19:30" },
+    { "trait_type": "Venue", "value": "Taipei Arena" },
+    { "trait_type": "Seat", "value": "C30" }
+  ]
+}

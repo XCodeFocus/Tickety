@@ -8,11 +8,11 @@ import {
 import { useState } from "react";
 import { ethers } from "ethers";
 import ConcertFactoryABI from "../contract/ConcertFactoryABI.json";
-const FACTORY_ADDRESS = "0xF4cd450447EBFBdE90cc3fD0BFa9175Fe687d5e1";
+const FACTORY_ADDRESS = "0x591A0204CFAA41B17517E63C5B48ed2C043E4137";
 
 export default function DeployForm() {
   const [concertName, setConcertName] = useState("");
-  const [time, setTime] = useState(""); // Optional, not used in contract
+  const [time, setTime] = useState("");
   const [price, setPrice] = useState("");
   const [amount, setAmount] = useState("");
   const [agree, setAgree] = useState(false);
@@ -59,7 +59,7 @@ export default function DeployForm() {
         timestamp
       );
       const receipt = await tx.wait();
-      // 從事件取得新合約地址
+      // extract the deployed contract address from the event logs
       const event = receipt.logs
         .map((log) => {
           try {
@@ -142,7 +142,7 @@ export default function DeployForm() {
             >
               I agree the
               <a
-                href="#"
+                href="/Tickety/#"
                 className="font-medium transition-colors hover:text-gray-900"
               >
                 &nbsp;Terms and Conditions
@@ -161,7 +161,7 @@ export default function DeployForm() {
         )}
         <Typography color="gray" className="mt-4 text-center font-normal mb-10">
           Trying to buy a ticket?{" "}
-          <a href="events" className="font-medium text-blue-900">
+          <a href="/Tickety/events" className="font-medium text-blue-900">
             Click here
           </a>
         </Typography>
