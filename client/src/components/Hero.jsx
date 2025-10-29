@@ -22,7 +22,7 @@ export default function Hero() {
               The perfect way to buy a concert ticket
             </h1>
             <p className="mt-8 text-pretty text-lg font-medium text-gray-500 sm:text-xl/8">
-              A blockchained ticketing platform that makes attending events
+              A blockchain ticketing platform that makes attending events
               simple, secure, and unforgettable.
             </p>
             <div className="mt-10 flex items-center justify-center gap-x-6">
