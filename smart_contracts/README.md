@@ -1,3 +1,6 @@
+compile:
+npx hardhat compile
+
 deploy locally:
 npx hardhat node
 npx hardhat run scripts/deploy.js --network localhost
@@ -9,6 +12,7 @@ Update factory address after deploying
 files with factory address:
 Deploy.jsx
 Event.jsx
+Tickets.jsx
 
 run test:
 npx hardhat test

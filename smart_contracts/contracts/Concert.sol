@@ -66,6 +66,20 @@ contract concert is ERC721URIStorage, Ownable {
     function endSale() public onlyOwner {
         saleActive = false;
     }
+    
+    // get all token IDs owned by an address
+    function tokensOfOwner(address owner) public view returns (uint256[] memory) {
+    uint256 count = balanceOf(owner);
+    uint256[] memory result = new uint256[](count);
+    uint256 idx = 0;
+    for (uint256 i = 1; i <= ticketId; i++) {
+        if (_ownerOf(i) == owner) {
+            result[idx] = i;
+            idx++;
+        }
+    }
+    return result;
+}
 
     // buy ticket from supplier
     function buyTicket(

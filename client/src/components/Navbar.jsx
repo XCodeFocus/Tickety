@@ -31,6 +31,11 @@ export default function Navbar() {
       href: "/Tickety/events",
       current: location.pathname === "/Tickety/events",
     },
+    {
+      name: "Tickets",
+      href: "/Tickety/tickets",
+      current: location.pathname === "/Tickety/tickets",
+    },
   ];
 
   return (

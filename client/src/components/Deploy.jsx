@@ -8,7 +8,7 @@ import {
 import { useState } from "react";
 import { ethers } from "ethers";
 import ConcertFactoryABI from "../contract/ConcertFactoryABI.json";
-const FACTORY_ADDRESS = "0x591A0204CFAA41B17517E63C5B48ed2C043E4137";
+const FACTORY_ADDRESS = "0x5c6bE22B7B5db415d942a2E42a388eBa3cB0F397";
 
 export default function DeployForm() {
   const [concertName, setConcertName] = useState("");

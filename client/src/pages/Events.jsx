@@ -5,12 +5,15 @@ import EventCard from "../components/EventCard";
 import Footer from "../components/Footer";
 import ConcertFactoryABI from "../contract/ConcertFactoryABI.json";
 import ConcertABI from "../contract/ConcertABI.json";
-const FACTORY_ADDRESS = "0x591A0204CFAA41B17517E63C5B48ed2C043E4137";
+const FACTORY_ADDRESS = "0x5c6bE22B7B5db415d942a2E42a388eBa3cB0F397";
 const HIDDEN_KEY = "hidden_concerts";
 
 function Events() {
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [hasMetaMask, setHasMetaMask] = useState(
+    Boolean(typeof window !== "undefined" && window.ethereum)
+  );
 
   // get hidden list from localStorage
   const getHidden = () => {
@@ -60,6 +63,8 @@ function Events() {
             address,
             name,
             price: ethers.formatEther(price),
+            maxTickets: Number(maxTickets),
+            ticketId: Number(sold),
             remain: remain.toString(),
             saleActive,
             time: Number(concertTime) * 1000,
@@ -76,6 +81,7 @@ function Events() {
   };
 
   useEffect(() => {
+    setHasMetaMask(Boolean(typeof window !== "undefined" && window.ethereum));
     fetchEvents();
   }, []);
 
@@ -90,32 +96,56 @@ function Events() {
   return (
     <div className="app-container">
       <Navbar />
-      <button
-        className="px-2 py-1 bg-gray-500 hover:bg-green-600 text-white shadow"
-        onClick={() => {
-          localStorage.removeItem("hidden_concerts");
-          window.location.reload();
-        }}
-      >
-        show all hidden events
-      </button>
-      <button
-        className="px-2 py-1 bg-gray-500 hover:bg-red-600 text-white shadow"
-        onClick={async () => {
-          // get all contract addresses
-          const provider = new ethers.BrowserProvider(window.ethereum);
-          const factory = new ethers.Contract(
-            FACTORY_ADDRESS,
-            ConcertFactoryABI,
-            provider
-          );
-          const addresses = await factory.getAllConcerts();
-          localStorage.setItem("hidden_concerts", JSON.stringify(addresses));
-          window.location.reload();
-        }}
-      >
-        hide all events
-      </button>
+
+      <div className="flex items-center gap-2 mt-4 ml-4">
+        <button
+          aria-label="show all hidden events"
+          className="px-3 py-1 bg-gray-600 hover:bg-gray-700 text-white rounded-full shadow-sm text-sm"
+          onClick={() => {
+            localStorage.removeItem("hidden_concerts");
+            window.location.reload();
+          }}
+        >
+          Show all
+        </button>
+
+        <button
+          aria-label="hide all events"
+          className="px-3 py-1 bg-red-600 hover:bg-red-700 text-white rounded-full shadow-sm text-sm"
+          onClick={async () => {
+            // get all contract addresses
+            const provider = new ethers.BrowserProvider(window.ethereum);
+            const factory = new ethers.Contract(
+              FACTORY_ADDRESS,
+              ConcertFactoryABI,
+              provider
+            );
+            const addresses = await factory.getAllConcerts();
+            localStorage.setItem("hidden_concerts", JSON.stringify(addresses));
+            window.location.reload();
+          }}
+        >
+          Hide all
+        </button>
+      </div>
+
+      {!hasMetaMask && (
+        <div className="mb-4 mt-4 p-3 bg-yellow-100 border-l-4 border-yellow-500">
+          <div className="text-sm">
+            MetaMask is not installed. Please install MetaMask to connect your
+            wallet.
+          </div>
+          <a
+            href="https://metamask.io/download/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-block mt-2 px-3 py-1 bg-blue-600 text-white rounded text-sm"
+          >
+            install MetaMask
+          </a>
+        </div>
+      )}
+
       <div className="flex-1">
         {loading ? (
           <div className="text-center mt-10">loading...</div>

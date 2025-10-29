@@ -7,9 +7,14 @@ function EventCard({ event, onBought, onDelete }) {
   const [actionLoading, setActionLoading] = useState(false);
   const [isOwner, setIsOwner] = useState(false);
   const [ownerAddress, setOwnerAddress] = useState("");
+  const [hasMetaMask, setHasMetaMask] = useState(
+    Boolean(typeof window !== "undefined" && window.ethereum)
+  );
 
   // check if is owner, and get owner address
   useEffect(() => {
+    // update metaMask presence flag on mount
+    setHasMetaMask(Boolean(typeof window !== "undefined" && window.ethereum));
     async function checkOwner() {
       if (!window.ethereum || !event?.address) return;
       try {
@@ -62,9 +67,12 @@ function EventCard({ event, onBought, onDelete }) {
         }
       }
 
-      const ticketId = event.remain ? event.max - event.remain + 1 : 1;
-      // change this to actual base URI after uploading to IPFS/Filebase
+      const max = Number(event.maxTickets);
+      const sold = Number(event.ticketId);
+      const ticketId = sold + 1;
+      // change to actual IPFS gateway URL
       const tokenURI = `https://senior-brown-chameleon.myfilebase.com/ipfs/QmUrSLg7KFfdYuR7oCvaBb8tF8htrJPbdztJKU9XUHrUXe/${ticketId}.json`;
+      console.log("ticketId =", ticketId, "tokenURI =", tokenURI);
       const priceStr =
         typeof event.price === "string" ? event.price : String(event.price);
       const buyer = await signer.getAddress();
