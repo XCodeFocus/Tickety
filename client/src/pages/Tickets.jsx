@@ -61,7 +61,7 @@ function Tickets() {
             provider
           );
 
-          // 先嘗試 tokensOfOwner，若不存在用 balance + tokenOfOwnerByIndex
+          // try tokensOfOwner first, then fallback to balanceOf + tokenOfOwnerByIndex
           let tokenIds = [];
           try {
             const raw = await contract.tokensOfOwner(userAddr);
@@ -87,7 +87,7 @@ function Tickets() {
 
           for (const id of tokenIds) {
             try {
-              // 取得 tokenURI 並 fetch metadata
+              // get tokenURI and fetch metadata
               const tokenParam = (() => {
                 try {
                   return BigInt(String(id).replace(/n$/i, ""));
@@ -105,7 +105,7 @@ function Tickets() {
                   "https://senior-brown-chameleon.myfilebase.com/ipfs/" +
                   metadataUrl.replace("ipfs://", "");
               } else {
-                // 確保 filename 為 id.json（簡單處理）
+                // make usre that filename is id.json
                 const parts = metadataUrl.split("/");
                 const last = parts[parts.length - 1] || "";
                 const cleanId = String(id).replace(/n$/i, "");
