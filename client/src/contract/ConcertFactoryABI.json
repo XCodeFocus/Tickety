@@ -19,6 +19,12 @@
           "internalType": "uint256",
           "name": "concertTime",
           "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "string",
+          "name": "baseCID",
+          "type": "string"
         }
       ],
       "name": "ConcertCreated",
@@ -64,6 +70,11 @@
           "internalType": "uint256",
           "name": "concertTime",
           "type": "uint256"
+        },
+        {
+          "internalType": "string",
+          "name": "baseCID",
+          "type": "string"
         }
       ],
       "name": "createConcert",

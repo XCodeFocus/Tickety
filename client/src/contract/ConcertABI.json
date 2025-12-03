@@ -25,6 +25,11 @@
           "internalType": "uint256",
           "name": "_concertTime",
           "type": "uint256"
+        },
+        {
+          "internalType": "string",
+          "name": "_baseCID",
+          "type": "string"
         }
       ],
       "stateMutability": "nonpayable",
@@ -362,6 +367,19 @@
           "internalType": "uint256",
           "name": "",
           "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "baseCID",
+      "outputs": [
+        {
+          "internalType": "string",
+          "name": "",
+          "type": "string"
         }
       ],
       "stateMutability": "view",

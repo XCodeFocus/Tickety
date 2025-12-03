@@ -2,12 +2,15 @@ import React, { useEffect, useState } from "react";
 import { ethers } from "ethers";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
+import { TicketCard } from "../components/TicketCard";
 import ConcertFactoryABI from "../contract/ConcertFactoryABI.json";
 import ConcertABI from "../contract/ConcertABI.json";
-
-const FACTORY_ADDRESS = "0x5c6bE22B7B5db415d942a2E42a388eBa3cB0F397";
+import { FACTORY_ADDRESS, METADATA_GATEWAY } from "../config";
+import { formatError } from "../utils/errors";
+import { useToast } from "../components/Toast";
 
 function Tickets() {
+  const toast = useToast();
   const [tickets, setTickets] = useState([]);
   const [loading, setLoading] = useState(true);
   const [errorMsg, setErrorMsg] = useState("");
@@ -17,12 +20,11 @@ function Tickets() {
   const [walletConnected, setWalletConnected] = useState(false);
   const [userAddress, setUserAddress] = useState("");
 
-  // fetch tickets for connected user
+  // fetch tickets for connected user (aggregate across all concert contracts)
   const fetchMyTickets = async (addr) => {
     setErrorMsg("");
     setLoading(true);
     try {
-      // use wallet provider when connected
       const provider = new ethers.BrowserProvider(window.ethereum);
       const signer = await provider.getSigner();
       const userAddr = addr || (await signer.getAddress());
@@ -87,7 +89,6 @@ function Tickets() {
 
           for (const id of tokenIds) {
             try {
-              // get tokenURI and fetch metadata
               const tokenParam = (() => {
                 try {
                   return BigInt(String(id).replace(/n$/i, ""));
@@ -102,10 +103,8 @@ function Tickets() {
               let metadataUrl = tokenURI;
               if (metadataUrl.startsWith("ipfs://")) {
                 metadataUrl =
-                  "https://senior-brown-chameleon.myfilebase.com/ipfs/" +
-                  metadataUrl.replace("ipfs://", "");
+                  METADATA_GATEWAY + metadataUrl.replace("ipfs://", "");
               } else {
-                // make usre that filename is id.json
                 const parts = metadataUrl.split("/");
                 const last = parts[parts.length - 1] || "";
                 const cleanId = String(id).replace(/n$/i, "");
@@ -115,16 +114,36 @@ function Tickets() {
                 }
               }
 
-              const res = await fetch(metadataUrl);
-              if (!res.ok) continue;
-              const contentType = res.headers.get("content-type") || "";
-              if (!contentType.includes("application/json")) continue;
-              const metadata = await res.json();
+              let metadata = null;
+              try {
+                const res = await fetch(metadataUrl);
+                if (!res.ok) continue;
+                try {
+                  metadata = await res.json();
+                } catch (e) {
+                  try {
+                    const txt = await res.text();
+                    metadata = JSON.parse(txt);
+                  } catch (e2) {
+                    continue;
+                  }
+                }
+              } catch (e) {
+                continue;
+              }
+
+              const attrs =
+                metadata?.attributes ||
+                metadata?.traits ||
+                metadata?.properties ||
+                metadata?.Attributes ||
+                [];
 
               allTickets.push({
                 tokenId: String(id).replace(/n$/i, ""),
                 contractAddress,
                 ...metadata,
+                attributes: attrs,
               });
             } catch {
               // ignore single token errors
@@ -137,7 +156,9 @@ function Tickets() {
 
       setTickets(allTickets);
     } catch (err) {
-      setErrorMsg(err.message || String(err));
+      const msg = formatError(err);
+      setErrorMsg(msg);
+      toast.error(msg);
       setTickets([]);
     }
     setLoading(false);
@@ -160,7 +181,7 @@ function Tickets() {
         if (accounts && accounts.length > 0) {
           setWalletConnected(true);
           setUserAddress(accounts[0]);
-          // auto-fetch when already connected
+          // auto-fetch tickets when already connected
           await fetchMyTickets(accounts[0]);
         } else {
           setWalletConnected(false);
@@ -185,83 +206,95 @@ function Tickets() {
       const accounts = await provider.listAccounts();
       if (accounts && accounts.length > 0) {
         setWalletConnected(true);
+        setUserAddress(accounts[0]);
         await fetchMyTickets(accounts[0]);
       }
     } catch (err) {
-      setErrorMsg(err?.message || String(err));
+      const msg = formatError(err);
+      setErrorMsg(msg);
+      toast.error(msg);
     }
   };
 
   return (
     <div className="app-container">
       <Navbar />
-      <div className="my-tickets p-4">
-        <h2 className="text-xl font-bold mb-4">🎟 My Tickets</h2>
-
-        {/* MetaMask not installed */}
-        {!hasMetaMask && (
-          <div className="mb-4 p-3 bg-yellow-100 border-l-4 border-yellow-500">
-            <div className="text-sm mb-2">
-              MetaMask is not installed. Please install MetaMask to connect your
-              wallet.
+      <div className="my-tickets px-4 py-6">
+        <div className="mx-auto max-w-7xl">
+          {/* MetaMask not installed */}
+          {!hasMetaMask && (
+            <div className="mb-4 p-3 bg-yellow-100 border-l-4 border-yellow-500">
+              <div className="text-sm mb-2">
+                MetaMask is not installed. Please install MetaMask to connect
+                your wallet.
+              </div>
+              <a
+                href="https://metamask.io/download/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-block px-3 py-1 bg-blue-600 text-white rounded text-sm"
+              >
+                Install MetaMask
+              </a>
             </div>
-            <a
-              href="https://metamask.io/download/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-block px-3 py-1 bg-blue-600 text-white rounded text-sm"
-            >
-              Install MetaMask
-            </a>
-          </div>
-        )}
+          )}
 
-        {/* MetaMask installed but not connected */}
-        {hasMetaMask && !walletConnected && (
-          <div className="mb-4 p-3 bg-blue-50 border-l-4 border-blue-400">
-            <div className="text-sm mb-2">
-              Connect your MetaMask wallet to view your tickets.
+          {/* MetaMask installed but not connected */}
+          {hasMetaMask && !walletConnected && (
+            <div className="mb-4 p-3 bg-blue-50 border-l-4 border-blue-400">
+              <div className="text-sm mb-2">
+                Connect your MetaMask wallet to view your tickets.
+              </div>
+              <button
+                onClick={handleConnect}
+                className="px-3 py-1 bg-blue-600 text-white rounded text-sm"
+              >
+                Connect Wallet
+              </button>
             </div>
-            <button
-              onClick={handleConnect}
-              className="px-3 py-1 bg-blue-600 text-white rounded text-sm"
-            >
-              Connect Wallet
-            </button>
-          </div>
-        )}
+          )}
 
-        {loading && <p>Loading your tickets...</p>}
-        {!loading && errorMsg && (
-          <p className="text-red-600">Error: {errorMsg}</p>
-        )}
-        {!loading && tickets.length === 0 && !errorMsg && walletConnected && (
-          <p>No tickets found.</p>
-        )}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {tickets.map((ticket) => (
-            <div
-              key={ticket.contractAddress + "-" + ticket.tokenId}
-              className="border rounded p-4 shadow bg-white"
-            >
-              <p className="font-semibold">Token ID: {ticket.tokenId}</p>
-              <p>Event: {ticket.name}</p>
-              <p>Contract: {ticket.contractAddress}</p>
-              <p>{ticket.description}</p>
-              {ticket.image && (
-                <img
-                  src={
-                    ticket.image.startsWith("ipfs://")
-                      ? "https://senior-brown-chameleon.myfilebase.com/ipfs/" +
-                        ticket.image.replace("ipfs://", "")
-                      : ticket.image
-                  }
-                  alt="ticket"
-                  className="mt-2 rounded"
-                />
-              )}
+          {loading && (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-4">
+              {Array.from({ length: 6 }).map((_, i) => (
+                <div
+                  key={i}
+                  className="rounded-xl border bg-white p-4 shadow-sm animate-pulse"
+                >
+                  <div className="w-full h-40 bg-gray-200 rounded mb-3" />
+                  <div className="h-4 bg-gray-200 rounded w-2/3 mb-2" />
+                  <div className="h-3 bg-gray-200 rounded w-full mb-1" />
+                  <div className="h-3 bg-gray-200 rounded w-5/6" />
+                </div>
+              ))}
             </div>
-          ))}
+          )}
+
+          {!loading && tickets.length === 0 && !errorMsg && walletConnected && (
+            <div className="text-center py-16 bg-gray-50 rounded-lg border">
+              <div className="text-4xl mb-2">🎟️</div>
+              <p className="text-gray-700 font-medium">No tickets found</p>
+              <p className="text-gray-500 text-sm mt-1">
+                Browse upcoming events and get your first ticket.
+              </p>
+              <a
+                href="/Tickety/events"
+                className="inline-block mt-4 px-3 py-1.5 bg-indigo-600 text-white rounded text-sm hover:bg-indigo-500"
+              >
+                See Events
+              </a>
+            </div>
+          )}
+
+          {!loading && tickets.length > 0 && (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-4">
+              {tickets.map((ticket) => (
+                <div key={`${ticket.contractAddress}-${ticket.tokenId}`}>
+                  <TicketCard ticket={ticket} />
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
       <Footer />

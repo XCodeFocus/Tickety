@@ -4,13 +4,20 @@
 # Node modules
 **/node_modules/
 
+#Metadata files
+metadata/
+
 # Hardhat build / cache
 smart_contracts/artifacts/
 smart_contracts/cache/
 smart_contracts/.deps/
+
+# Project report
+report/
 
 # Log / tmp files
 *.log
 *.tmp
 
 .DS_Store
+.vscode
