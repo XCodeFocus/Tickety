@@ -1,8 +1,10 @@
 import React, { createContext, useState, useContext, useEffect } from "react";
+import { useToast } from "../components/Toast";
 const WalletContext = createContext();
 
 export function WalletProvider({ children }) {
   const [account, setAccount] = useState(null);
+  const toast = useToast();
 
   const connectWallet = async () => {
     if (window.ethereum) {
@@ -15,7 +17,7 @@ export function WalletProvider({ children }) {
         console.error("Error connecting to MetaMask:", error);
       }
     } else {
-      alert(
+      toast.error(
         "MetaMask is not installed. Please install it to use this feature."
       );
     }

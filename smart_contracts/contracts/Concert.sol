@@ -10,6 +10,7 @@ contract concert is ERC721URIStorage, Ownable {
     uint256 public maxTickets;
     uint256 public ticketPrice;
     uint256 public concertTime; 
+    string public baseCID; // IPFS base CID stored on-chain
 
     bool public saleActive;
 
@@ -25,13 +26,15 @@ contract concert is ERC721URIStorage, Ownable {
         uint256 _ticketPrice,
         string memory _concertName,
         address _owner,
-        uint256 _concertTime 
+        uint256 _concertTime,
+        string memory _baseCID
     ) ERC721(_concertName, "TCK") Ownable(_owner) {
         ticketId = 0;
         maxTickets = _maxTickets;
         ticketPrice = _ticketPrice;
         saleActive = false;
         concertTime = _concertTime; 
+        baseCID = _baseCID; // persist base CID for deterministic tokenURI construction
     }
 
     // override _update from ERC721.sol to prohibit transfer
